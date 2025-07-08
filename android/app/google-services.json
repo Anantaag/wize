@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "309653991955",
+    "project_id": "wize-app-9b52d",
+    "storage_bucket": "wize-app-9b52d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309653991955:android:90ad17105549c5b4eb45e6",
+        "android_client_info": {
+          "package_name": "com.example.accident_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8TVfNnbfNk1iYSfjt4e6TDqrNPWzi9NA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
