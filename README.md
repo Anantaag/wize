@@ -48,14 +48,3 @@ yaml
 Copy
 Edit
 
----
-
-### ✅ Next Steps
-
-1. Replace your existing `README.md` content with this.
-2. Run:
-
-```bash
-git add README.md
-git commit -m "Update README with Wize app description"
-git push
