@@ -3,7 +3,6 @@ import '../home_page.dart';
 import '../history_page.dart';
 import '../community_page.dart';
 import '../profile_page.dart';
-import '../settings_page.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -18,7 +17,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
     HistoryPage(),
     CommunityPage(),
     ProfilePage(),
-    SettingsPage(),
+  ];
+
+  final List<BottomNavigationBarItem> _navItems = const [
+    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+    BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+    BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Community'),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
   ];
 
   void _onItemTapped(int index) {
@@ -26,14 +31,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
       _selectedIndex = index;
     });
   }
-
-  final List<BottomNavigationBarItem> _navItems = const [
-    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-    BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-    BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Community'),
-    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-    BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-  ];
 
   @override
   Widget build(BuildContext context) {
