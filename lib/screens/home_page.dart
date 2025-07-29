@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wize_app/screens/contact_form_screen.dart';
+import 'package:wize_app/screens/email_setup_screen.dart'; // ✅ Add this import
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -100,7 +101,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, // Match app theme
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text('Wize'),
         centerTitle: true,
@@ -159,13 +160,12 @@ class _HomePageState extends State<HomePage> {
           ),
           Spacer(flex: 3),
           Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => ContactFormScreen()),
+                  MaterialPageRoute(builder: (context) => ContactFormScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -176,6 +176,27 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Text(
                 'Setup Emergency Contact',
+                style: TextStyle(color: Colors.deepPurple),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EmailSetupScreen()), // ✅ Navigate to email setup
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: StadiumBorder(),
+                elevation: 6,
+              ),
+              child: Text(
+                'Setup Emergency Email',
                 style: TextStyle(color: Colors.deepPurple),
               ),
             ),
