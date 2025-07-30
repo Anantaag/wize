@@ -4,8 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:wize_app/screens/contact_form_screen.dart';
-import 'package:wize_app/screens/email_setup_screen.dart'; // ✅ Add this import
+import 'package:url_launcher/url_launcher.dart';
+import 'contact_form_screen.dart';
+import 'email_setup_screen.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -20,22 +21,33 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     requestPermissions();
+    _initializeNotifications();
   }
 
   Future<void> requestPermissions() async {
     await [
       Permission.location,
-      Permission.camera,
-      Permission.microphone,
+      Permission.sms,
       Permission.contacts,
     ].request();
   }
 
+  Future<void> _initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
   Future<void> sendSosAlert() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
+      final String mapLink =
+          'https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
       await FirebaseFirestore.instance.collection('sos_alerts').add({
         'triggered_at': Timestamp.now(),
@@ -60,6 +72,7 @@ class _HomePageState extends State<HomePage> {
         ),
       );
 
+      // Send SMS
       final contactsSnapshot = await FirebaseFirestore.instance
           .collection('emergency_contacts')
           .orderBy('timestamp', descending: true)
@@ -67,29 +80,46 @@ class _HomePageState extends State<HomePage> {
           .get();
 
       if (contactsSnapshot.docs.isNotEmpty) {
-        final data = contactsSnapshot.docs.first.data();
+        final contact = contactsSnapshot.docs.first.data();
         final List<String> recipients = [
-          data['primary_contact'],
-          data['alternate_contact'],
+          contact['primary_contact'],
+          contact['alternate_contact'],
         ];
 
-        final message =
-            "🚨 SOS! I need help. My location: https://maps.google.com/?q=${position.latitude},${position.longitude}";
+        final smsMessage = "🚨 SOS! I need help. My location: $mapLink";
 
         await sendSMS(
-          message: message,
+          message: smsMessage,
           recipients: recipients,
           sendDirect: false,
         );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('🚨 SOS sent with location & SMS!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No emergency contact found')),
-        );
       }
+
+      // Send Email
+      final emailSnapshot = await FirebaseFirestore.instance
+          .collection('emergency_emails')
+          .orderBy('timestamp', descending: true)
+          .limit(1)
+          .get();
+
+      if (emailSnapshot.docs.isNotEmpty) {
+        final email = emailSnapshot.docs.first.data()['email'];
+        final subject = Uri.encodeComponent("🚨 SOS Alert");
+        final body = Uri.encodeComponent(
+            "🚨 I need help. My current location: $mapLink");
+
+        final Uri emailLaunchUri = Uri(
+          scheme: 'mailto',
+          path: email,
+          query: 'subject=$subject&body=$body',
+        );
+
+        await launchUrl(emailLaunchUri);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('🚨 SOS sent via SMS and Email!')),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error sending SOS: $e')),
@@ -100,16 +130,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Wize'),
+        title: const Text('Wize'),
         centerTitle: true,
       ),
       body: Column(
         children: [
-          Spacer(flex: 2),
-          Text(
+          const Spacer(flex: 2),
+          const Text(
             'PRESS THIS BUTTON IN CASE OF EMERGENCY',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -119,7 +150,7 @@ class _HomePageState extends State<HomePage> {
               letterSpacing: 1.2,
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           GestureDetector(
             onTap: sendSosAlert,
             child: Container(
@@ -129,10 +160,10 @@ class _HomePageState extends State<HomePage> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [Colors.redAccent.shade700, Colors.red],
-                  center: Alignment(-0.3, -0.3),
+                  center: const Alignment(-0.3, -0.3),
                   radius: 0.9,
                 ),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black38,
                     offset: Offset(0, 8),
@@ -145,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                   width: 6,
                 ),
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'SOS',
                   style: TextStyle(
@@ -158,47 +189,47 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          Spacer(flex: 3),
+          const Spacer(flex: 3),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ContactFormScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: StadiumBorder(),
-                elevation: 6,
-              ),
-              child: Text(
-                'Setup Emergency Contact',
-                style: TextStyle(color: Colors.deepPurple),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EmailSetupScreen()), // ✅ Navigate to email setup
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: StadiumBorder(),
-                elevation: 6,
-              ),
-              child: Text(
-                'Setup Emergency Email',
-                style: TextStyle(color: Colors.deepPurple),
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => ContactFormScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: const StadiumBorder(),
+                    elevation: 6,
+                  ),
+                  child: const Text(
+                    'Setup Emergency Contact',
+                    style: TextStyle(color: Colors.deepPurple),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => EmailSetupScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: const StadiumBorder(),
+                    elevation: 6,
+                  ),
+                  child: const Text(
+                    'Setup Emergency Email',
+                    style: TextStyle(color: Colors.deepPurple),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
