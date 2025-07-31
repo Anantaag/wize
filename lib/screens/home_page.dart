@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
       final String mapLink =
           'https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
+      // Store to Firestore
       await FirebaseFirestore.instance.collection('sos_alerts').add({
         'triggered_at': Timestamp.now(),
         'status': 'pending',
@@ -57,6 +58,7 @@ class _HomePageState extends State<HomePage> {
         'longitude': position.longitude,
       });
 
+      // Local notification
       await flutterLocalNotificationsPlugin.show(
         0,
         '🚨 SOS Alert Triggered!',
@@ -86,7 +88,8 @@ class _HomePageState extends State<HomePage> {
           contact['alternate_contact'],
         ];
 
-        final smsMessage = "🚨 SOS! I need help. My location: $mapLink";
+        final smsMessage =
+            "🚨 SOS! I need help. My location: $mapLink";
 
         await sendSMS(
           message: smsMessage,
@@ -196,13 +199,15 @@ class _HomePageState extends State<HomePage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => ContactFormScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => ContactFormScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     shape: const StadiumBorder(),
                     elevation: 6,
                   ),
@@ -214,13 +219,15 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => EmailSetupScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => EmailSetupScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     shape: const StadiumBorder(),
                     elevation: 6,
                   ),
@@ -232,6 +239,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
