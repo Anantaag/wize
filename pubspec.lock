@@ -671,6 +671,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.5"
+  quick_actions:
+    dependency: "direct main"
+    description:
+      name: quick_actions
+      sha256: "7e35dd6a21f5bbd21acf6899039eaf85001a5ac26d52cbd6a8a2814505b90798"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
+  quick_actions_android:
+    dependency: transitive
+    description:
+      name: quick_actions_android
+      sha256: "8d88e90a236ffe92f1026ecc3b85acfefedffccb0c1be1c94c1c0298e8483ad8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.21"
+  quick_actions_ios:
+    dependency: transitive
+    description:
+      name: quick_actions_ios
+      sha256: "837b7e6b5973784d3da56b8c959b446b215914f20405d88cd7d22a2fb94e4e4c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
+  quick_actions_platform_interface:
+    dependency: transitive
+    description:
+      name: quick_actions_platform_interface
+      sha256: "1fec7068db5122cd019e9340d3d7be5d36eab099695ef3402c7059ee058329a4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -748,6 +780,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  uni_links:
+    dependency: "direct main"
+    description:
+      name: uni_links
+      sha256: "051098acfc9e26a9fde03b487bef5d3d228ca8f67693480c6f33fd4fbb8e2b6e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.1"
+  uni_links_platform_interface:
+    dependency: transitive
+    description:
+      name: uni_links_platform_interface
+      sha256: "929cf1a71b59e3b7c2d8a2605a9cf7e0b125b13bc858e55083d88c62722d4507"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  uni_links_web:
+    dependency: transitive
+    description:
+      name: uni_links_web
+      sha256: "7539db908e25f67de2438e33cc1020b30ab94e66720b5677ba6763b25f6394df"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   unicode:
     dependency: transitive
     description:

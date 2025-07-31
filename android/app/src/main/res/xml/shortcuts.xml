@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="sosShortcut"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="Send SOS"
+        android:shortcutLongLabel="Send Emergency SOS Alert"
+        android:shortcutDisabledMessage="SOS Shortcut disabled">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.wize_app"
+            android:targetClass=".MainActivity"
+            android:data="sos://trigger" />
+    </shortcut>
+</shortcuts>

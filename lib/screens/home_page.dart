@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'contact_form_screen.dart';
 import 'email_setup_screen.dart';
 
@@ -12,16 +13,17 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}): super(key: key);
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
     requestPermissions();
-    _initializeNotifications();
+    initializeNotifications();
   }
 
   Future<void> requestPermissions() async {
@@ -32,24 +34,23 @@ class _HomePageState extends State<HomePage> {
     ].request();
   }
 
-  Future<void> _initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
+  Future<void> initializeNotifications() async {
+    const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    const InitializationSettings settings =
+        InitializationSettings(android: androidSettings);
+    await flutterLocalNotificationsPlugin.initialize(settings);
   }
 
   Future<void> sendSosAlert() async {
     try {
-      final Position position = await Geolocator.getCurrentPosition(
+      Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
       final String mapLink =
           'https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
-      // Store to Firestore
       await FirebaseFirestore.instance.collection('sos_alerts').add({
         'triggered_at': Timestamp.now(),
         'status': 'pending',
@@ -58,7 +59,6 @@ class _HomePageState extends State<HomePage> {
         'longitude': position.longitude,
       });
 
-      // Local notification
       await flutterLocalNotificationsPlugin.show(
         0,
         '🚨 SOS Alert Triggered!',
@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
         ),
       );
 
-      // Send SMS
+      // SMS
       final contactsSnapshot = await FirebaseFirestore.instance
           .collection('emergency_contacts')
           .orderBy('timestamp', descending: true)
@@ -87,18 +87,17 @@ class _HomePageState extends State<HomePage> {
           contact['primary_contact'],
           contact['alternate_contact'],
         ];
-
-        final smsMessage =
+        final message =
             "🚨 SOS! I need help. My location: $mapLink";
 
         await sendSMS(
-          message: smsMessage,
+          message: message,
           recipients: recipients,
           sendDirect: false,
         );
       }
 
-      // Send Email
+      // Email
       final emailSnapshot = await FirebaseFirestore.instance
           .collection('emergency_emails')
           .orderBy('timestamp', descending: true)
@@ -111,13 +110,19 @@ class _HomePageState extends State<HomePage> {
         final body = Uri.encodeComponent(
             "🚨 I need help. My current location: $mapLink");
 
-        final Uri emailLaunchUri = Uri(
+        final Uri emailUri = Uri(
           scheme: 'mailto',
           path: email,
           query: 'subject=$subject&body=$body',
         );
 
-        await launchUrl(emailLaunchUri);
+        if (await canLaunchUrl(emailUri)) {
+          await launchUrl(emailUri);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not open email app')),
+          );
+        }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -133,7 +138,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -201,7 +205,8 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => ContactFormScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => ContactFormScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -221,7 +226,8 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => EmailSetupScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => EmailSetupScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
