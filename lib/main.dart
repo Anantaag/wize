@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
 
 import 'screens/home_page.dart';
 import 'screens/history_page.dart';
@@ -33,9 +32,10 @@ class BottomNavBarWrapper extends StatefulWidget {
 class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
   int _selectedIndex = 0;
   final GlobalKey<HomePageState> _homePageKey = GlobalKey<HomePageState>();
-  StreamSubscription? _sub;
+  StreamSubscription<Uri>? _sub;
 
   late List<Widget> _pages;
+  final AppLinks _appLinks = AppLinks();
 
   @override
   void initState() {
@@ -49,8 +49,8 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
     ];
 
     _handleInitialUri();
-    _sub = uriLinkStream.listen((Uri? uri) {
-      if (uri != null && _isSosLink(uri)) {
+    _sub = _appLinks.uriLinkStream.listen((Uri uri) {
+      if (_isSosLink(uri)) {
         _triggerSosFromLink();
       }
     }, onError: (err) {
@@ -74,16 +74,14 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
 
   Future<void> _handleInitialUri() async {
     try {
-      final uri = await getInitialUri();
+      final uri = await _appLinks.getInitialAppLink();
       if (uri != null && _isSosLink(uri)) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _triggerSosFromLink();
         });
       }
-    } on PlatformException catch (e) {
-      print('PlatformException: $e');
-    } on FormatException catch (e) {
-      print('FormatException: $e');
+    } catch (e) {
+      print('Error getting initial URI: $e');
     }
   }
 
