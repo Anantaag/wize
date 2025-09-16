@@ -21,8 +21,7 @@ To get this project up and running locally:
 2. **Install dependencies**
 
 bash
-Copy
-Edit
+
 flutter pub get
 Set up Firebase
 
@@ -31,8 +30,7 @@ Set up Firebase
 4. **Run the app**
 
 bash
-Copy
-Edit
+
 flutter run
 ⚠️ This app requires location and SMS permissions. Use a real device for testing.
 
@@ -44,7 +42,5 @@ Firebase Docs
 FlutterFire CLI Setup
 
 👩‍💻 Developed by Ananta Agarwal
-yaml
-Copy
-Edit
+
 
