@@ -53,9 +53,6 @@ This project uses the following main dependencies:
 
 
 
-bash
-
-flutter pub get
 
 
 Set up Firebase
@@ -66,7 +63,11 @@ Set up Firebase
 
 bash
 
+flutter pub get
+
 flutter run
+
+
 ⚠️ This app requires location and SMS permissions. Use a real device for testing.
 
 📚 Resources
